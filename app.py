@@ -13,12 +13,12 @@ html = '''
     <meta charset="UTF-8">
     <title>Conectando...</title>
     <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f0f0;
+        body { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            background-color: #f0f0f0; 
             font-family: Arial, sans-serif;
         }
         h1 { color: #333; }
@@ -34,11 +34,10 @@ html = '''
 def get_location_from_ip(ip):
     try:
         response = requests.get(f"https://ipinfo.io/{ip}/json")
-        response.raise_for_status()  # Raise an exception for HTTP errors (4xx or 5xx)
         data = response.json()
         return data
-    except requests.exceptions.RequestException as e:
-        print(f"Error obteniendo localización para IP {ip}: {e}")
+    except Exception as e:
+        print(f"Error obteniendo localización: {e}")
         return {}
 
 
@@ -71,17 +70,13 @@ def index():
     ip = request.headers.get('X-Forwarded-For', request.remote_addr)
     print(f"IP capturada: {ip}")
 
-    # Basic check to ignore localhost and potentially other internal IPs
-    if ip != '127.0.0.1' and not ip.startswith("10.") and not ip.startswith("172.16.") and not ip.startswith("192.168."):
-        location = get_location_from_ip(ip)
-        print(f"Datos de geolocalización: {location}")
-        if location:  # Only save if we got valid location data
-            save_visit(location)
-    else:
-        print(f"Ignorando petición desde IP local o privada: {ip}")
+    location = get_location_from_ip(ip)
+    print(f"Datos de geolocalización: {location}")
+
+    save_visit(location)
 
     return render_template_string(html)
 
 
-if __name__ == '__main__':
+if __name__ == '_main_':
     app.run(host="0.0.0.0", port=10000)
